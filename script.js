@@ -1,3 +1,6 @@
+// Global tracking for Window layering depths
+let topZIndex = 50;
+
 // --- System Clock Engine ---
 function updateClock() {
     const clockElement = document.getElementById('clock');
@@ -13,34 +16,82 @@ function updateClock() {
     
     clockElement.textContent = `${hours}:${minutes} ${ampm}`;
 }
+setInterval(updateClock, 1000);
+updateClock();
 
+// --- Reusable Window Application Factory ---
 function launchApp(appName, contentHTML) {
     const desktop = document.getElementById('desktop');
     const template = document.getElementById('window-template');
+    if (!desktop || !template) return;
     
-    // Clone the template structure
+    // Clone template tree structure
     const windowClone = template.content.cloneNode(true);
     const windowElement = windowClone.querySelector('.window');
     
-    // Customize the instance
+    // Configure window elements
     windowElement.querySelector('.window-title').textContent = appName;
     windowElement.querySelector('.window-body').innerHTML = contentHTML;
     
-    // Set active state display style
-    windowElement.style.display = 'flex';
+    // Push window depth to the foreground on initialization
+    topZIndex++;
+    windowElement.style.zindex = topZIndex;
     
-    // Make the close button work for *this specific window*
-    windowElement.querySelector('.close-btn').addEventListener('click', () => {
-        windowElement.remove(); // Destroys the window from the DOM entirely
+    // Add Layering Focus Handler
+    windowElement.addEventListener('mousedown', () => {
+        topZIndex++;
+        windowElement.style.zIndex = topZIndex;
+    });
+
+    // Close and tear down component
+    windowElement.querySelector('.close-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        windowElement.remove();
     });
     
-    // Drop it onto the desktop
+    // Drop window instance onto desktop space
     desktop.appendChild(windowElement);
 }
 
-// Initial call and set intervals
-setInterval(updateClock, 1000);
-updateClock();
+// --- Application Core Registries ---
+const AppRegistry = {
+    terminal: {
+        title: "KiloCore Terminal",
+        content: `
+            <p class="cli-line">> KILO OS Kernel Initialized...</p>
+            <p class="cli-line">> Status: Ready for integration.</p>
+            <p class="cli-line" style="margin-top: 10px; color:#aaa">> Type "help" for a list of internal functions.</p>
+        `
+    },
+    browser: {
+        title: "Kilo Web Explorer",
+        content: `<iframe src="https://example.com" style="width:100%; height:100%; border:none; background:#fff;"></iframe>`
+    },
+    trash: {
+        title: "System Trash Bin",
+        content: `<p style="color: rgba(255,255,255,0.4); text-align:center; margin-top:40px;">Trash folder is empty.</p>`
+    }
+};
+
+function launchFromRegistry(appKey) {
+    const app = AppRegistry[appKey];
+    if (app) {
+        launchApp(app.title, app.content);
+    }
+}
+
+// --- Global Icon Listener Dynamic Mapper ---
+document.querySelectorAll('icon[data-app]').forEach(iconElement => {
+    iconElement.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const appKey = iconElement.getAttribute('data-app');
+        launchFromRegistry(appKey);
+        
+        // Auto-collapse start menu if an item was run inside it
+        const startMenu = document.getElementById('startMenu');
+        if (startMenu) startMenu.classList.remove('active');
+    });
+});
 
 // --- Start Menu Controls ---
 const startBtn = document.getElementById('startBtn');
@@ -49,55 +100,10 @@ const startMenu = document.getElementById('startMenu');
 if (startBtn && startMenu) {
     startBtn.addEventListener('click', (event) => {
         startMenu.classList.toggle('active');
-        event.stopPropagation(); // Prevents immediate close from body listener
+        event.stopPropagation();
     });
 
-    // Close the start menu when clicking on the open workspace desktop
     document.addEventListener('click', () => {
         startMenu.classList.remove('active');
     });
-}
-
-// --- Window Manager (Open/Close System Core App) ---
-const coreAppIcon = document.getElementById('coreAppIcon');
-const appWindow = document.getElementById('appWindow');
-const closeWindowBtn = document.getElementById('closeWindowBtn');
-
-if (coreAppIcon && appWindow && closeWindowBtn) {
-    coreAppIcon.addEventListener('click', () => {
-        appWindow.style.display = 'flex';
-    });
-
-    closeWindowBtn.addEventListener('click', () => {
-        appWindow.style.display = 'none';
-    });
-}
-
-// Launching a text terminal
-coreAppIcon.addEventListener('click', () => {
-    launchApp('Terminal', `<p class="cli-line">> Initializing console...</p>`);
-});
-
-// Launching a simple notes app
-notesIcon.addEventListener('click', () => {
-    launchApp('Notes', `<textarea style="width:100%; height:100%; background:none; color:#fff; border:none; resize:none; outline:none;"></textarea>`);
-});
-
-const AppRegistry = {
-    terminal: {
-        title: "System Terminal",
-        content: `<div class="terminal-body"><p>> Type "help" to begin.</p></div>`
-    },
-    browser: {
-        title: "Kilo Web Explorer",
-        content: `<iframe src="https://example.com" style="width:100%; height:100%; border:none;"></iframe>`
-    }
-};
-
-// Then call them dynamically by their key names:
-function launchFromRegistry(appKey) {
-    const app = AppRegistry[appKey];
-    if (app) {
-        launchApp(app.title, app.content);
-    }
 }

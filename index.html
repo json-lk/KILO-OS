@@ -11,7 +11,7 @@
     <taskbar>
         <taskarea>
             <p id="startBtn">KILO OS</p>
-            </taskarea>
+        </taskarea>
         <systemtray>
             <sound>🔊 100%</sound>
             <time id="clock">00:00 AM</time>
@@ -20,32 +20,21 @@
 
     <startmenu id="startMenu">
         <h3>Applications</h3>
-        <icon class="browser-icon">Browser</icon>
-        <icon class="terminal-icon">Terminal</icon>
+        <icon class="browser-icon" data-app="browser">Browser</icon>
+        <icon class="terminal-icon" data-app="terminal">Terminal</icon>
     </startmenu>
 
     <desktoparea id="desktop">
-        <icon class="terminal-icon" id="coreAppIcon">KiloCore</icon>
-        <icon class="trash-icon">Trash</icon>
+        <icon class="terminal-icon" data-app="terminal" id="coreAppIcon">KiloCore</icon>
+        <icon class="trash-icon" data-app="trash">Trash</icon>
         
-        <div class="window" id="appWindow">
-            <div class="window-header">
-                <span class="window-title">KiloCore System Panel</span>
-                <button class="close-btn" id="closeWindowBtn"></button>
-            </div>
-            <div class="window-body">
-                <p class="cli-line">> KILO OS Kernel Initialized...</p>
-                <p class="cli-line">> Status: System fully functional and ready for deployment.</p>
-            </div>
-        </div>
         <template id="window-template">
             <div class="window">
                 <div class="window-header">
                     <span class="window-title">App Name</span>
                     <button class="close-btn"></button>
                 </div>
-                <div class="window-body">
-                </div>
+                <div class="window-body"></div>
             </div>
         </template>
     </desktoparea>

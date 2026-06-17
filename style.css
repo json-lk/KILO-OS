@@ -161,7 +161,7 @@ startmenu h3 {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-    display: none;
+    display: flex; /* Changed from none since generation script uses append/remove */
     flex-direction: column;
     overflow: hidden;
     z-index: 50;
