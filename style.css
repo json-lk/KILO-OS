@@ -1,0 +1,205 @@
+/* --- Core Reset & Variables --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+:root {
+    --bg-color: #1a1a24;
+    --taskbar-bg: rgba(30, 30, 40, 0.85);
+    --surface-bg: rgba(45, 45, 60, 0.9);
+    --accent-color: #5865f2;
+    --text-color: #e3e5e8;
+    --border-color: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-color);
+    background-image: radial-gradient(circle at 50% 50%, #29293d 0%, #1a1a24 100%);
+    color: var(--text-color);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column-reverse; /* Naturally forces taskbar to bottom */
+}
+
+/* --- Taskbar --- */
+taskbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 48px;
+    background: var(--taskbar-bg);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-color);
+    padding: 0 12px;
+    z-index: 100;
+}
+
+taskarea {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 100%;
+}
+
+taskarea p {
+    font-weight: 800;
+    letter-spacing: 1px;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+taskarea p:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+systemtray {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+}
+
+systemtray time, systemtray sound {
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+systemtray time:hover, systemtray sound:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Desktop Workspace --- */
+desktoparea {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(90px, 1fr));
+    grid-auto-flow: column; /* Orders icons vertically down first */
+    gap: 15px;
+    padding: 20px;
+    flex-grow: 1;
+    position: relative;
+}
+
+/* Custom Icon Components */
+icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 80px;
+    height: 85px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+}
+
+icon:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+icon::before {
+    content: "📁";
+    font-size: 32px;
+    margin-bottom: 6px;
+}
+
+icon.terminal-icon::before { content: "💻"; }
+icon.browser-icon::before { content: "🌐"; }
+icon.trash-icon::before { content: "🗑️"; }
+
+/* --- Start Menu Window --- */
+startmenu {
+    display: none;
+    position: absolute;
+    bottom: 54px;
+    left: 12px;
+    width: 320px;
+    height: 400px;
+    background: var(--surface-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 90;
+    padding: 15px;
+}
+
+startmenu.active {
+    display: block;
+}
+
+startmenu h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- Window Manager Interface --- */
+.window {
+    position: absolute;
+    top: 15%;
+    left: 25%;
+    width: 500px;
+    height: 320px;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 50;
+}
+
+.window-header {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.window-title {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.close-btn {
+    background: #ff5f56;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.window-body {
+    padding: 15px;
+    flex-grow: 1;
+    font-size: 14px;
+    line-height: 1.5;
+    background: rgba(15, 15, 20, 0.4);
+}
+
+.cli-line {
+    color: #4af626;
+    font-family: monospace;
+    margin-top: 4px;
+}
